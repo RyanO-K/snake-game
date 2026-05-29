@@ -1,0 +1,56 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a1a2e;
+  color: #eaeaea;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+#app {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+#game-container {
+  border: 2px solid #e94560;
+  box-shadow: 0 0 24px rgba(233, 69, 96, 0.4);
+}
+
+#game-canvas {
+  display: block;
+}
+
+#score-panel {
+  min-width: 160px;
+  padding: 1rem;
+  border: 1px solid #333;
+  background: #16213e;
+}
+
+#score-panel h2 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #e94560;
+  margin-bottom: 0.75rem;
+}
+
+#score-list {
+  list-style: none;
+  padding: 0;
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+#score-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #222;
+  padding: 2px 0;
+}
