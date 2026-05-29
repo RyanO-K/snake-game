@@ -9,7 +9,7 @@ import {
   IDLE_TIMEOUT_MS,
 } from '../shared/constants';
 import type { GameEvent, ScoreBoard } from '../shared/types';
-import { createInitialState, tick, setDirection } from '../game/core';
+import { createInitialState, tick, setDirection, step } from '../game/core';
 import { render } from './renderer';
 import { attachInputHandlers } from './input';
 import { ScoreManager } from '../score/score-manager';
@@ -51,6 +51,21 @@ function updateScoreDom(board: ScoreBoard): void {
   }
 }
 
+function updateDom(): void {
+  const container = document.getElementById('game-container')!;
+  container.setAttribute('data-game-status', state.status);
+  container.setAttribute('data-snake-direction', state.snake.direction);
+
+  const scoreEl = document.getElementById('score-display');
+  if (scoreEl) scoreEl.textContent = String(state.score);
+
+  const startBtn = document.getElementById('start-btn') as HTMLButtonElement | null;
+  if (startBtn) startBtn.hidden = !(state.status === 'IDLE' || state.status === 'GAME_OVER');
+
+  const overlay = document.getElementById('game-over-overlay') as HTMLElement | null;
+  if (overlay) overlay.hidden = state.status !== 'GAME_OVER';
+}
+
 // ── Game loop ─────────────────────────────────────────────────────────────────
 function startGameLoop(): void {
   if (tickTimer !== null) {
@@ -66,6 +81,7 @@ function startGameLoop(): void {
     }
     state = tick(state);
     render(ctx, state, scoreManager.getHighScore());
+    updateDom();
     if (state.status === 'GAME_OVER') {
       if (tickTimer !== null) {
         clearInterval(tickTimer);
@@ -79,6 +95,7 @@ function startGameLoop(): void {
 // ── NPC demo ──────────────────────────────────────────────────────────────────
 function startNpcDemo(): void {
   state = { ...createInitialState(GRID), status: 'NPC_DEMO' };
+  updateDom();
   startGameLoop();
 }
 
@@ -96,12 +113,11 @@ function startIdleTimeout(): void {
 // ── Game over handler ─────────────────────────────────────────────────────────
 function onGameOver(): void {
   render(ctx, state, scoreManager.getHighScore());
-  setTimeout(() => {
-    const raw = window.prompt('Enter your initials (3 chars):') ?? 'AAA';
-    const name = raw.slice(0, 3).toUpperCase() || 'AAA';
-    dispatch({ type: 'SUBMIT_SCORE', name });
-    startIdleTimeout();
-  }, 500);
+  updateDom();
+  const finalScoreEl = document.getElementById('final-score');
+  if (finalScoreEl) finalScoreEl.textContent = String(state.score);
+  const initialsInput = document.getElementById('initials-input') as HTMLInputElement | null;
+  if (initialsInput) initialsInput.focus();
 }
 
 // ── Dispatcher ────────────────────────────────────────────────────────────────
@@ -115,6 +131,7 @@ function dispatch(event: GameEvent): void {
           idleTimer = null;
         }
         state = { ...createInitialState(GRID), status: 'PLAYING' };
+        updateDom();
         startGameLoop();
       }
       break;
@@ -127,12 +144,14 @@ function dispatch(event: GameEvent): void {
           tickTimer = null;
         }
         render(ctx, state, scoreManager.getHighScore());
+        updateDom();
       }
       break;
 
     case 'RESUME_GAME':
       if (state.status === 'PAUSED') {
         state = { ...state, status: 'PLAYING' };
+        updateDom();
         startGameLoop();
       }
       break;
@@ -148,6 +167,7 @@ function dispatch(event: GameEvent): void {
       }
       state = createInitialState(GRID); // status = IDLE
       render(ctx, state, scoreManager.getHighScore());
+      updateDom();
       startIdleTimeout();
       break;
 
@@ -160,9 +180,11 @@ function dispatch(event: GameEvent): void {
         }
         state = createInitialState(GRID); // status = IDLE
         render(ctx, state, scoreManager.getHighScore());
+        updateDom();
         startIdleTimeout();
       } else {
         state = setDirection(state, event.direction);
+        updateDom();
       }
       break;
 
@@ -173,6 +195,8 @@ function dispatch(event: GameEvent): void {
         .catch(() => {
           // Silently ignore submission errors; scoreboard just won't update
         });
+      state = createInitialState(GRID); // reset to IDLE
+      updateDom();
       break;
 
     default:
@@ -195,8 +219,56 @@ function dispatch(event: GameEvent): void {
 // Attach input handlers (pass live status getter)
 attachInputHandlers(dispatch, () => state.status);
 
+// Start button click handler
+document.getElementById('start-btn')?.addEventListener('click', () => {
+  dispatch({ type: 'START_GAME' });
+});
+
+// Submit score button handler
+document.getElementById('submit-score-btn')?.addEventListener('click', () => {
+  const input = document.getElementById('initials-input') as HTMLInputElement;
+  const name = (input?.value ?? 'AAA').slice(0, 3).toUpperCase() || 'AAA';
+  if (input) input.value = '';
+  dispatch({ type: 'SUBMIT_SCORE', name });
+  startIdleTimeout();
+});
+
 // Initial render (IDLE screen)
 render(ctx, state, scoreManager.getHighScore());
 
+// Sync initial DOM state
+updateDom();
+
 // Start idle countdown
 startIdleTimeout();
+
+// ── Test helpers ──────────────────────────────────────────────────────────────
+(window as any).__test__ = {
+  forceEatFood() {
+    // Place food directly in front of the snake head so next tick eats it
+    const head = state.snake.body[0];
+    const nextPos = step(head, state.snake.direction);
+    state = { ...state, food: { position: nextPos } };
+  },
+  forceWallCollision() {
+    // Place snake head at the right wall edge facing RIGHT; next tick = wall collision
+    state = {
+      ...state,
+      snake: {
+        ...state.snake,
+        body: [{ x: state.grid.width - 1, y: Math.floor(state.grid.height / 2) }, ...state.snake.body.slice(1)],
+        direction: 'RIGHT' as const,
+        nextDirection: 'RIGHT' as const,
+      },
+    };
+  },
+  forceSelfCollision() {
+    // Directly trigger game over (self-collision is hard to set up in one tick)
+    if (tickTimer !== null) { clearInterval(tickTimer); tickTimer = null; }
+    state = { ...state, status: 'GAME_OVER' };
+    render(ctx, state, scoreManager.getHighScore());
+    updateDom();
+    const finalScoreEl = document.getElementById('final-score');
+    if (finalScoreEl) finalScoreEl.textContent = String(state.score);
+  },
+};

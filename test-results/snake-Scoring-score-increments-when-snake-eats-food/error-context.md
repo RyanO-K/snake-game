@@ -29,8 +29,35 @@ Call log:
   - heading "High Scores" [level=2] [ref=e6]
   - list [ref=e7]:
     - listitem [ref=e8]:
-      - generic [ref=e9]: AAA
-      - generic [ref=e10]: "0"
+      - generic [ref=e9]: X10
+      - generic [ref=e10]: "100"
+    - listitem [ref=e11]:
+      - generic [ref=e12]: X9
+      - generic [ref=e13]: "90"
+    - listitem [ref=e14]:
+      - generic [ref=e15]: ROK
+      - generic [ref=e16]: "90"
+    - listitem [ref=e17]:
+      - generic [ref=e18]: X8
+      - generic [ref=e19]: "80"
+    - listitem [ref=e20]:
+      - generic [ref=e21]: X7
+      - generic [ref=e22]: "70"
+    - listitem [ref=e23]:
+      - generic [ref=e24]: X6
+      - generic [ref=e25]: "60"
+    - listitem [ref=e26]:
+      - generic [ref=e27]: X5
+      - generic [ref=e28]: "50"
+    - listitem [ref=e29]:
+      - generic [ref=e30]: TST
+      - generic [ref=e31]: "42"
+    - listitem [ref=e32]:
+      - generic [ref=e33]: X4
+      - generic [ref=e34]: "40"
+    - listitem [ref=e35]:
+      - generic [ref=e36]: AAA
+      - generic [ref=e37]: "40"
 ```
 
 # Test source

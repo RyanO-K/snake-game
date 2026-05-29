@@ -28,7 +28,16 @@ Call log:
 ```yaml
 - heading "High Scores" [level=2]
 - list:
-  - listitem: AAA 0
+  - listitem: X10 100
+  - listitem: X9 90
+  - listitem: ROK 90
+  - listitem: X8 80
+  - listitem: X7 70
+  - listitem: X6 60
+  - listitem: X5 50
+  - listitem: TST 42
+  - listitem: X4 40
+  - listitem: AAA 40
 ```
 
 # Test source
