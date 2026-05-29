@@ -20,11 +20,11 @@ export const COLORS = {
   grid:        '#16213e',
   snakeHead:   '#e94560',
   snakeBody:   '#c23152',
-  snakeTail:   '#3a1a2e',
+  snakeTail:   '#7a2040',
   food:        '#f5a623',
   npcHead:     '#00b4d8',
   npcBody:     '#0077b6',
-  npcTail:     '#0a1a2e',
+  npcTail:     '#0055a0',
   text:        '#eaeaea',
   overlay:     'rgba(0,0,0,0.6)',
 };
