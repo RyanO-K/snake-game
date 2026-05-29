@@ -79,7 +79,7 @@ const server = http.createServer((req, res) => {
     res.end(data);
   });
 });
-
-server.listen(SERVER_PORT, () => {
-  console.log(`Snake server running at http://localhost:${SERVER_PORT}`);
+const port = Number(process.env.PORT) || SERVER_PORT;
+server.listen(port, () => {
+  console.log(`Snake server running at http://localhost:${port}`);
 });

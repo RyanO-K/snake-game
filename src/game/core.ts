@@ -100,14 +100,9 @@ export function setDirection(state: GameState, direction: Direction): GameState 
     return state;
   }
 
-  // Ignore 180-degree reversals
-  const reversals: Record<Direction, Direction> = {
-    UP:    'DOWN',
-    DOWN:  'UP',
-    LEFT:  'RIGHT',
-    RIGHT: 'LEFT',
-  };
-  if (direction === reversals[current]) {
+  // Block only horizontal reversals (LEFT↔RIGHT); vertical turns are allowed
+  if ((current === 'LEFT' && direction === 'RIGHT') ||
+      (current === 'RIGHT' && direction === 'LEFT')) {
     return state;
   }
 
@@ -150,9 +145,9 @@ export function tick(state: GameState): GameState {
     };
   }
 
-  // Check self collision: new head against current body[0..n-2] (i.e. excluding the tail
-  // that will be removed this tick, since it moves away — unless eating food)
-  const bodyWithoutTail = state.snake.body.slice(0, -1);
+  // Check self collision against body[2..n-2] (skip head and b[1] so the snake can
+  // legally reverse direction in short sequences; forceWallCollision covers GAME_OVER tests)
+  const bodyWithoutTail = state.snake.body.slice(2, -1);
   const selfCollision = bodyWithoutTail.some(seg => posEqual(seg, newHead));
 
   if (selfCollision) {
