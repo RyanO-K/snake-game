@@ -27,7 +27,8 @@ Call log:
 
 ```yaml
 - heading "High Scores" [level=2]
-- list
+- list:
+  - listitem: AAA 0
 ```
 
 # Test source

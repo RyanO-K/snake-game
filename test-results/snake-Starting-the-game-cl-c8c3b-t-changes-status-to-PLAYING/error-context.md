@@ -12,11 +12,11 @@
 # Error details
 
 ```
-Test timeout of 10000ms exceeded.
+Test timeout of 8000ms exceeded.
 ```
 
 ```
-Error: page.click: Test timeout of 10000ms exceeded.
+Error: page.click: Test timeout of 8000ms exceeded.
 Call log:
   - waiting for locator('[data-testid="start-btn"]')
 
@@ -27,7 +27,10 @@ Call log:
 ```yaml
 - generic [ref=e5]:
   - heading "High Scores" [level=2] [ref=e6]
-  - list
+  - list [ref=e7]:
+    - listitem [ref=e8]:
+      - generic [ref=e9]: AAA
+      - generic [ref=e10]: "0"
 ```
 
 # Test source
@@ -105,7 +108,7 @@ Call log:
   70  | 
   71  |   test('clicking Start changes status to PLAYING', async ({ page }) => {
 > 72  |     await page.click('[data-testid="start-btn"]');
-      |                ^ Error: page.click: Test timeout of 10000ms exceeded.
+      |                ^ Error: page.click: Test timeout of 8000ms exceeded.
   73  |     await expect(page.locator('[data-game-status="PLAYING"]')).toBeVisible();
   74  |   });
   75  | 

@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: snake.spec.ts >> Snake movement >> ArrowUp changes direction to UP
-- Location: tests\snake.spec.ts:111:7
+- Name: snake.spec.ts >> Scoring >> score increments when snake eats food
+- Location: tests\snake.spec.ts:158:7
 
 # Error details
 

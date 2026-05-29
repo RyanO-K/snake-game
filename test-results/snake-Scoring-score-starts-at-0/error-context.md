@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: snake.spec.ts >> Snake movement >> ArrowDown changes direction to DOWN
-- Location: tests\snake.spec.ts:104:7
+- Name: snake.spec.ts >> Scoring >> score starts at 0
+- Location: tests\snake.spec.ts:154:7
 
 # Error details
 
