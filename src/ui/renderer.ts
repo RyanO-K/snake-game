@@ -45,26 +45,28 @@ export function render(ctx: CanvasRenderingContext2D, state: GameState, highScor
 
   // 4 & 5. Draw snake body and head
   const isNpc = status === 'NPC_DEMO';
-  const bodyColor = isNpc ? COLORS.npcBody : COLORS.snakeBody;
   const headColor = isNpc ? COLORS.npcHead : COLORS.snakeHead;
+  const tailColor = isNpc ? COLORS.npcTail : COLORS.snakeTail;
 
   const radius = cellSize * 0.2;
+  const len = snake.body.length;
 
-  // Draw body segments (excluding head)
-  ctx.fillStyle = bodyColor;
-  for (let i = 1; i < snake.body.length; i++) {
+  // Draw body segments (excluding head) with a head→tail gradient
+  for (let i = 1; i < len; i++) {
+    const t = len > 2 ? (i - 1) / (len - 2) : 1; // 0 near head, 1 at tail
+    ctx.fillStyle = lerpColor(headColor, tailColor, t);
     const seg = snake.body[i];
     drawRoundedRect(ctx, seg.x * cellSize + 1, seg.y * cellSize + 1, cellSize - 2, cellSize - 2, radius);
     ctx.fill();
   }
 
-  // Draw head (slightly brighter via a lighter fill)
-  if (snake.body.length > 0) {
+  // Draw head
+  if (len > 0) {
     const head = snake.body[0];
     ctx.fillStyle = headColor;
     drawRoundedRect(ctx, head.x * cellSize + 1, head.y * cellSize + 1, cellSize - 2, cellSize - 2, radius + 1);
     ctx.fill();
-    // Add a subtle inner highlight for the head
+    // Subtle inner highlight
     ctx.save();
     ctx.globalAlpha = 0.3;
     ctx.fillStyle = '#ffffff';
@@ -111,6 +113,18 @@ export function render(ctx: CanvasRenderingContext2D, state: GameState, highScor
     ctx.fillText(tag, canvasW - 10, 7);
     ctx.textAlign = 'left';
   }
+}
+
+/** Linearly interpolate between two hex colors. t=0 → a, t=1 → b. */
+function lerpColor(a: string, b: string, t: number): string {
+  const ah = parseInt(a.slice(1), 16);
+  const bh = parseInt(b.slice(1), 16);
+  const ar = (ah >> 16) & 0xff, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
+  const br = (bh >> 16) & 0xff, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
+  const r = Math.round(ar + (br - ar) * t);
+  const g = Math.round(ag + (bg - ag) * t);
+  const bl = Math.round(ab + (bb - ab) * t);
+  return `#${((1 << 24) | (r << 16) | (g << 8) | bl).toString(16).slice(1)}`;
 }
 
 function drawRoundedRect(
