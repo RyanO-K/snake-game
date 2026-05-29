@@ -3,3 +3,4 @@ dist/
 public/bundle.js
 scores.json
 *.js.map
+/test-results
