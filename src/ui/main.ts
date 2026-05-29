@@ -182,7 +182,9 @@ function dispatch(event: GameEvent): void {
         render(ctx, state, scoreManager.getHighScore());
         updateDom();
         startIdleTimeout();
-      } else {
+      } else if (state.status !== 'PAUSED') {
+        // Record last-pressed direction on canvas (regardless of reversal block)
+        canvas.setAttribute('data-snake-direction', event.direction);
         state = setDirection(state, event.direction);
         updateDom();
       }

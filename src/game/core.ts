@@ -100,11 +100,13 @@ export function setDirection(state: GameState, direction: Direction): GameState 
     return state;
   }
 
-  // Block only horizontal reversals (LEFT↔RIGHT); vertical turns are allowed
-  if ((current === 'LEFT' && direction === 'RIGHT') ||
-      (current === 'RIGHT' && direction === 'LEFT')) {
-    return state;
-  }
+  // Block 180° reversals against both committed direction AND buffered nextDirection
+  // (handles immediate reversals and rapid double-press before the next tick)
+  const opposites: Record<Direction, Direction> = {
+    UP: 'DOWN', DOWN: 'UP', LEFT: 'RIGHT', RIGHT: 'LEFT',
+  };
+  if (direction === opposites[current]) return state;
+  if (direction === opposites[state.snake.nextDirection]) return state;
 
   return {
     ...state,
@@ -145,9 +147,7 @@ export function tick(state: GameState): GameState {
     };
   }
 
-  // Check self collision against body[2..n-2] (skip head and b[1] so the snake can
-  // legally reverse direction in short sequences; forceWallCollision covers GAME_OVER tests)
-  const bodyWithoutTail = state.snake.body.slice(2, -1);
+  const bodyWithoutTail = state.snake.body.slice(0, -1);
   const selfCollision = bodyWithoutTail.some(seg => posEqual(seg, newHead));
 
   if (selfCollision) {
